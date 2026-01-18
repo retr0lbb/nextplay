@@ -1,5 +1,4 @@
 import { RegisterForm } from "@/features/register/register-form";
-import { SelectPlatformForm } from "@/features/register/select-plataforms-form";
 
 export default function RegisterPage() {
   // Simulando dados da API
@@ -16,7 +15,7 @@ export default function RegisterPage() {
       </div>
 
       <div className="flex flex-1 items-center justify-center">
-        <SelectPlatformForm />
+        <RegisterForm />
       </div>
     </main>
   );

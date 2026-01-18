@@ -19,25 +19,35 @@ const platforms = [
 
 export function SelectPlatformForm() {
   return (
-    <form className="columns-2 space-y-4">
-      {platforms.map((plat) => {
-        return (
-          <div
-            key={plat.id}
-            className="relative flex items-center justify-center p-4 border border-slate-400 rounded-lg 
-            group-target:bg-blue-700/50"
-          >
-            <input
-              className="inset-0 absolute z-10 opacity-100 group"
-              type="checkbox"
-              name="platform"
-              id={plat.id.toString()}
-              value={plat.id}
-            />
-            <p className="text-slate-200">{plat.name}</p>
-          </div>
-        );
-      })}
+    <form className="flex flex-col pb-16 px-5 gap-2 justify-center">
+      <div className="flex flex-1 flex-wrap content-center justify-center gap-2 overflow-x-hidden overflow-y-auto">
+        {platforms.map((plat) => {
+          return (
+            <div
+              key={plat.id}
+              className="relative flex items-center justify-center p-4 border border-slate-400 rounded-lg 
+                has-[input:checked]:bg-blue-600/40 has-[input:checked]:border-blue-900 transition-all
+            "
+            >
+              <input
+                className="inset-0 absolute z-10 opacity-0 group"
+                type="checkbox"
+                name="platform"
+                id={plat.id.toString()}
+                value={plat.id}
+              />
+              <p className="text-slate-200">{plat.name}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:shadow-none active:scale-98 mt-2"
+      >
+        Finish
+      </button>
     </form>
   );
 }
