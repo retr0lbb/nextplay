@@ -3,11 +3,12 @@
 import { Loading } from "@/components/loading";
 import { useFetchGames } from "@/hooks/use-fetch-games";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function SelectPlayedGames() {
   const [gameName, setGameName] = useState("");
   const [debouncedGameName, setDebouncedGameName] = useState("");
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -17,12 +18,37 @@ export function SelectPlayedGames() {
     return () => clearTimeout(timeout);
   }, [gameName]);
 
-  const { games, error, loading } = useFetchGames({
-    gameName: debouncedGameName,
-  });
+  const { games, hasError, isLoading, hasNext, next, fetchNextPage } =
+    useFetchGames({
+      gameName: debouncedGameName,
+    });
 
-  if (error) {
-    return <p className="text-red-400">{error}</p>;
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNext || isLoading) return;
+
+    const scrollContainer = loadMoreRef.current.parentElement;
+    if (!scrollContainer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          fetchNextPage(next);
+        }
+      },
+      {
+        root: scrollContainer,
+        rootMargin: "200px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNext, isLoading, next]);
+
+  if (hasError) {
+    return <p className="text-red-400">{hasError}</p>;
   }
 
   return (
@@ -38,7 +64,7 @@ export function SelectPlayedGames() {
       </div>
 
       <div className="flex-1 columns-2 space-y-3 overflow-y-auto relative">
-        {!loading ? (
+        {!isLoading ? (
           games.map((game) => (
             <div
               key={game.id}
@@ -66,6 +92,7 @@ export function SelectPlayedGames() {
         ) : (
           <Loading />
         )}
+        <div ref={loadMoreRef} className="h-10 w-full" />
       </div>
     </div>
   );
