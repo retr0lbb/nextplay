@@ -1,13 +1,40 @@
+"use client";
+
 import { FaUser } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 import { MdGamepad } from "react-icons/md";
 import { PiGraphFill } from "react-icons/pi";
 import { RiComputerFill } from "react-icons/ri";
 import { IoGameController } from "react-icons/io5";
 import Link from "next/link";
+import { useState } from "react";
+import { GameRecommender } from "@/components/recomender-component";
 
 export default function HomePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <main className="w-full h-svh bg-slate-950 flex flex-col relative">
+      <div
+        className={`absolute inset-0 w-full h-full p-6 z-10 ${isModalOpen ? "block" : "hidden"}`}
+      >
+        <div className="w-full h-full flex flex-col gap-4 items-center justify-center bg-slate-900 rounded-lg border border-slate-100/20 p-4">
+          <div className="flex items-center w-full justify-end ">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="p-3"
+            >
+              <IoMdClose className="size-10 text-slate-500" />
+            </button>
+          </div>
+
+          <div className="flex flex-1">
+            <GameRecommender />
+          </div>
+        </div>
+      </div>
+
       <div className="absolute top-5 left-5 size-14 bg-slate-800 border border-slate-100/20 rounded-full grid place-items-center">
         <FaUser className="text-slate-200 size-6" />
       </div>
@@ -15,6 +42,7 @@ export default function HomePage() {
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-6">
             <button
+              onClick={() => setIsModalOpen(true)}
               type="button"
               className="size-56 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 transition-all flex items-center justify-center shadow-[0_0_60px_rgba(99,102,241,0.5)]"
             >
