@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { FaGoogle } from "react-icons/fa";
 
 export default function Home() {
   return (
@@ -22,31 +21,16 @@ export default function Home() {
             Register
           </button>
         </Link>
-        <button
-          type="button"
-          className="text-slate-200 text-xl px-4 py-1.5 
+        <Link href={"/auth/login"}>
+          <button
+            type="button"
+            className="text-slate-200 text-xl px-4 py-1.5 
           border border-slate-200/20 rounded-lg bg-slate-200/10 
           hover:bg-slate-300/20 transition-all"
-        >
-          Login
-        </button>
-      </div>
-
-      <div className="w-full flex items-center justify-center px-5">
-        <div className="w-full h-px bg-slate-400 rounded-xl" />
-        <p className="text-slate-400 p-4">OR</p>
-        <div className="w-full h-px bg-slate-400 rounded-xl" />
-      </div>
-
-      <div className="flex flex-col w-full items-center justify-center gap-2">
-        <button
-          type="button"
-          className="text-slate-200 text-xl px-4 py-1.5 flex items-center gap-2 
-          border border-slate-200/20 rounded-lg bg-slate-200/10 
-          hover:bg-slate-300/20 transition-all"
-        >
-          <FaGoogle /> <p>Login com google</p>
-        </button>
+          >
+            Login
+          </button>
+        </Link>
       </div>
     </div>
   );
