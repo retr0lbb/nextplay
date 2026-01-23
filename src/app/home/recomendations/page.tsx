@@ -1,3 +1,4 @@
+import { RecomendationGameDropdown } from "@/components/recomendation-game-dropdown";
 import Image from "next/image";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
@@ -139,7 +140,9 @@ function RecommendationGame(props: RecommendationGameProps) {
       </div>
 
       <div className="flex flex-1 items-center justify-end mr-3">
-        <BsThreeDotsVertical className="text-slate-300 size-7" />
+        <RecomendationGameDropdown
+          trigger={<BsThreeDotsVertical className="text-slate-300 size-7" />}
+        />
       </div>
     </div>
   );

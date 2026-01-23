@@ -1,6 +1,5 @@
 "use client";
 
-import { FaUser } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { IoGameController } from "react-icons/io5";
 import { useState } from "react";
@@ -12,9 +11,9 @@ export default function HomePage() {
   return (
     <>
       <div
-        className={`absolute inset-0 w-full h-full p-6 z-10 ${isModalOpen ? "block" : "hidden"}`}
+        className={`absolute inset-0 w-full h-full p-6 z-10 ${isModalOpen ? "block" : "hidden"} min-h-0`}
       >
-        <div className="w-full h-full flex flex-col gap-4 items-center justify-center bg-slate-900 rounded-lg border border-slate-100/20 p-4">
+        <div className="w-full h-full flex flex-col gap-4 items-center justify-center bg-slate-900 rounded-lg border border-slate-100/20 p-4 min-h-0">
           <div className="flex items-center w-full justify-end ">
             <button
               type="button"
@@ -25,7 +24,7 @@ export default function HomePage() {
             </button>
           </div>
 
-          <div className="flex flex-1">
+          <div className="flex flex-1 min-h-0">
             <GameRecommender />
           </div>
         </div>

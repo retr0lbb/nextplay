@@ -23,36 +23,57 @@ function LittleBetterText(props: { text: string }) {
 
 export function GameRecommender() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-6 flex-1">
-        <div className="flex flex-col items-center justify-center gap-6">
-          <h2 className="text-3xl font-bold text-slate-200">
-            {randomGame.name}
-          </h2>
-          <Image src={randomGame.imageSrc} width={700} height={400} alt="" />
-          <p className="whitespace-normal text-slate-300 text-sm">
-            {randomGame.summary}
-          </p>
-        </div>
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-6">
+        {[randomGame, randomGame, randomGame].map((game, index) => (
+          <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: <needless>
+            key={index}
+            className="flex flex-col gap-4 rounded-xl border border-white/10 bg-slate-900/80 p-4"
+          >
+            <div className="flex gap-4">
+              <Image
+                src={game.imageSrc}
+                width={120}
+                height={160}
+                alt=""
+                className="rounded-lg object-cover shrink-0"
+              />
 
-        <ul className="list-disc pl-10 space-y-3">
-          <li className="text-lg text-slate-200">
-            pontuação: <LittleBetterText text="346.981" />
-          </li>
+              <div className="flex flex-col gap-2">
+                <h2 className="text-lg font-semibold text-slate-200 leading-tight">
+                  {game.name}
+                </h2>
 
-          <li className="text-lg text-slate-200">
-            plataformas: <LittleBetterText text="Xbox One" />{" "}
-            <LittleBetterText text="Play Station 4" />{" "}
-            <LittleBetterText text="pc" />
-          </li>
-        </ul>
+                <p className="text-sm text-slate-400 line-clamp-4">
+                  {game.summary}
+                </p>
+              </div>
+            </div>
+
+            <ul className="flex flex-col gap-2">
+              <li className="text-sm text-slate-300 flex flex-wrap gap-2">
+                pontuação:
+                <LittleBetterText text="346.981" />
+              </li>
+
+              <li className="text-sm text-slate-300 flex flex-wrap gap-2">
+                plataformas:
+                <LittleBetterText text="Xbox One" />
+                <LittleBetterText text="PS4" />
+                <LittleBetterText text="PC" />
+              </li>
+            </ul>
+          </div>
+        ))}
       </div>
-      <div className="flex flex-col gap-2 items-center justify-center pb-4">
+
+      <div className="sticky bottom-0 w-full border-t border-white/10 p-4">
         <button
           type="button"
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-semibold py-3.5 px-6 rounded-lg transition-all shadow-lg hover:shadow-xl disabled:shadow-none active:scale-98 mt-2"
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 text-white font-semibold py-3.5 rounded-lg transition-all"
         >
-          Salvar
+          Salvar recomendações
         </button>
       </div>
     </div>
