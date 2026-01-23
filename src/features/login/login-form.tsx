@@ -3,10 +3,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
+import axios from "axios";
 
 const registrationFormSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -16,8 +16,10 @@ const registrationFormSchema = z.object({
 type RegistrationFormData = z.infer<typeof registrationFormSchema>;
 
 export function LoginForm() {
+  const navigator = useRouter();
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegistrationFormData>({
@@ -29,7 +31,26 @@ export function LoginForm() {
   });
 
   async function onSubmit(data: RegistrationFormData) {
-    console.log(data);
+    try {
+      const { email, password } = data;
+
+      const response = await axios.post(
+        "http://localhost:3333/api/auth/login",
+        { email, password },
+      );
+
+      if (response.status !== 200) {
+        throw new Error("Error while doing the login");
+      }
+
+      localStorage.setItem("np-token", response.data.token);
+
+      navigator.push("/home");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      reset();
+    }
   }
 
   return (
