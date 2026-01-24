@@ -9,6 +9,7 @@ export function SelectPlayedGames() {
   const [gameName, setGameName] = useState("");
   const [debouncedGameName, setDebouncedGameName] = useState("");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -23,8 +24,9 @@ export function SelectPlayedGames() {
       gameName: debouncedGameName,
     });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <needless>
   useEffect(() => {
-    if (!loadMoreRef.current || !hasNext || isLoading) return;
+    if (!loadMoreRef.current) return;
 
     const scrollContainer = loadMoreRef.current.parentElement;
     if (!scrollContainer) return;
@@ -37,7 +39,7 @@ export function SelectPlayedGames() {
       },
       {
         root: scrollContainer,
-        rootMargin: "200px",
+        rootMargin: "150px",
         threshold: 0,
       },
     );
@@ -45,7 +47,7 @@ export function SelectPlayedGames() {
     observer.observe(loadMoreRef.current);
 
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNext, isLoading, next]);
+  }, [fetchNextPage]);
 
   if (hasError) {
     return <p className="text-red-400">{hasError}</p>;
@@ -93,7 +95,7 @@ export function SelectPlayedGames() {
             <Loading />
           </div>
         )}
-        <div ref={loadMoreRef} className="h-10 w-full" />
+        {hasNext && <div ref={loadMoreRef} className="h-10 w-full" />}
       </div>
     </div>
   );

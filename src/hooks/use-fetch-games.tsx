@@ -60,12 +60,15 @@ export function useFetchGames({ gameName = "" }: FetchGamesProps) {
       gameName,
     )}&key=${process.env.NEXT_PUBLIC_RAWG_API_KEY}`;
 
+    setGames([]);
+    setNextUrl(null);
+
     fetchGames(url, false);
   }, [gameName, fetchGames]);
 
   const fetchNextPage = useCallback(
-    (url: string) => {
-      if (!url || loading) return;
+    (url: string | null) => {
+      if (!url || loading || isFetchingRef.current) return;
       fetchGames(url, true);
     },
     [loading, fetchGames],
