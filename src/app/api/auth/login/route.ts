@@ -10,9 +10,13 @@ export async function POST(request: Request) {
   const body: LoginBodyDto = await request.json();
   try {
     const { data } = await api.post("/auth/login", body);
-    return NextResponse.json(data);
+
+    const response = NextResponse.json({ ok: true });
+
+    response.cookies.set("np-token", data.token, { httpOnly: true, path: "/" });
+
+    return response;
   } catch (err) {
-    console.log(err);
     return NextResponse.json(
       { error: "Erro ao efetuar o login" },
       { status: 500 },

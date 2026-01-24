@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
+import axios from "axios";
 
 const registrationFormSchema = z.object({
   userName: z.string(),
@@ -25,9 +26,31 @@ export function RegisterForm() {
     resolver: zodResolver(registrationFormSchema),
   });
 
-  function handleFormSubmit(data: z.infer<typeof registrationFormSchema>) {
-    console.log(data);
+  async function handleFormSubmit(
+    data: z.infer<typeof registrationFormSchema>,
+  ) {
+    const response = await axios.post("/api/auth/register", {
+      userName: data.userName,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (response.status !== 200) {
+      throw new Error("Error While registering");
+    }
+
+    const loginResponse = await axios.post("/api/auth/login", {
+      email: data.email,
+      password: data.password,
+    });
+
+    if (loginResponse.status !== 200) {
+      throw new Error("Error while connecting after register");
+    }
+    localStorage.setItem("np-token", loginResponse.data.token);
     reset();
+
+    window.location.href = "/games/add";
   }
 
   return (
