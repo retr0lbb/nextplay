@@ -1,19 +1,17 @@
 "use client";
 
 import { Loading } from "@/components/loading";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useFetchGames } from "@/hooks/use-fetch-games";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scoll";
-import axios from "axios";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
-export function SelectPlayedGames() {
-  const [gameName, setGameName] = useState("");
-  const debouncedName = useDebounce<string>(gameName, 500);
+export function SelectPlayedGames(props: { gameName: string }) {
   const parentRef = useRef(null);
 
-  const { games, isLoading, fetchNext, hasNext } = useFetchGames(debouncedName);
+  const { games, isLoading, fetchNext, hasNext } = useFetchGames(
+    props.gameName,
+  );
 
   const { loadMoreRef } = useInfiniteScroll(
     () => {

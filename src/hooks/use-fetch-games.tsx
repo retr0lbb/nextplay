@@ -40,7 +40,7 @@ export function useFetchGames(gameName: string) {
           },
         );
 
-        setGames((prev) => [...prev, ...games]);
+        return games;
       }
     } catch (error) {
       alert(error);
@@ -50,12 +50,23 @@ export function useFetchGames(gameName: string) {
   }, []);
 
   useEffect(() => {
-    fetchGame(baseUrl);
+    async function reallyGetGames() {
+      const games = await fetchGame(baseUrl);
+
+      if (!games) return;
+
+      setGames(games);
+    }
+    reallyGetGames();
   }, [baseUrl, fetchGame]);
 
-  const fetchNext = useCallback(() => {
+  const fetchNext = useCallback(async () => {
     if (nextUrl && hasNext) {
-      fetchGame(nextUrl);
+      const games = await fetchGame(nextUrl);
+
+      if (!games) return;
+
+      setGames((prev) => [...prev, ...games]);
     }
   }, [nextUrl, hasNext, fetchGame]);
 
