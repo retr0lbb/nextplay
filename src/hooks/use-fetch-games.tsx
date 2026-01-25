@@ -1,85 +1,63 @@
 "use client";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-
-interface FetchGamesProps {
-  gameName?: string;
-}
-
-export interface GameResult {
-  name: string;
+interface GameObj {
   id: number;
+  name: string;
   imageUrl: string;
 }
 
-interface UseFetchGamesReturn {
-  next: string;
-  hasNext: boolean;
-  games: GameResult[];
-  isLoading: boolean;
-  hasError: boolean;
-  fetchNextPage: (url: string) => void;
-}
-
-export function useFetchGames({ gameName = "" }: FetchGamesProps) {
-  const [games, setGames] = useState<GameResult[]>([]);
+export function useFetchGames(gameName: string) {
+  const [games, setGames] = useState<GameObj[]>([]);
   const [nextUrl, setNextUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const isFetchingRef = useRef(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasNext, setHasNext] = useState(false);
 
-  const fetchGames = useCallback(async (url: string, append = false) => {
-    if (isFetchingRef.current) return;
+  const baseUrl = `https://api.rawg.io/api/games?search=${encodeURIComponent(
+    gameName,
+  )}&key=${process.env.NEXT_PUBLIC_RAWG_API_KEY}`;
 
-    isFetchingRef.current = true;
-    setLoading(true);
-    setError(null);
-
+  const fetchGame = useCallback(async (url: string) => {
     try {
-      const response = await fetch(url);
-      const data = await response.json();
+      setIsLoading(true);
 
-      const formatted: GameResult[] = data.results.map((game: any) => ({
-        id: game.id,
-        name: game.name,
-        imageUrl: game.background_image,
-      }));
+      const response = await axios.get(url);
 
-      setGames((prev) => (append ? [...prev, ...formatted] : formatted));
-      setNextUrl(data.next);
-    } catch (error: any) {
-      setError(error.message ?? "Erro inesperado");
+      if (response.data.next !== null) {
+        setNextUrl(response.data.next);
+        setHasNext(true);
+      }
+
+      if (response.data.results && response.data.results.length > 0) {
+        const games: GameObj[] = response.data.results.map(
+          (game: { id: number; background_image: string; name: string }) => {
+            return {
+              id: game.id,
+              imageUrl: game.background_image,
+              name: game.name,
+            } as GameObj;
+          },
+        );
+
+        setGames((prev) => [...prev, ...games]);
+      }
+    } catch (error) {
+      alert(error);
     } finally {
-      isFetchingRef.current = false;
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(
-      gameName,
-    )}&key=${process.env.NEXT_PUBLIC_RAWG_API_KEY}`;
+    fetchGame(baseUrl);
+  }, [baseUrl, fetchGame]);
 
-    setGames([]);
-    setNextUrl(null);
+  const fetchNext = useCallback(() => {
+    if (nextUrl && hasNext) {
+      fetchGame(nextUrl);
+    }
+  }, [nextUrl, hasNext, fetchGame]);
 
-    fetchGames(url, false);
-  }, [gameName, fetchGames]);
-
-  const fetchNextPage = useCallback(
-    (url: string | null) => {
-      if (!url || loading || isFetchingRef.current) return;
-      fetchGames(url, true);
-    },
-    [loading, fetchGames],
-  );
-
-  return {
-    games,
-    isLoading: loading,
-    hasError: error ?? false,
-    fetchNextPage: fetchNextPage,
-    next: nextUrl,
-    hasNext: Boolean(nextUrl),
-  } as UseFetchGamesReturn;
+  return { games, hasNext, isLoading, fetchNext };
 }

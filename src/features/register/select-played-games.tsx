@@ -1,77 +1,44 @@
 "use client";
 
 import { Loading } from "@/components/loading";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useFetchGames } from "@/hooks/use-fetch-games";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scoll";
+import axios from "axios";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 export function SelectPlayedGames() {
   const [gameName, setGameName] = useState("");
-  const [debouncedGameName, setDebouncedGameName] = useState("");
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const isFetchingRef = useRef(false);
+  const debouncedName = useDebounce<string>(gameName, 500);
+  const parentRef = useRef(null);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedGameName(gameName);
-    }, 500);
+  const { games, isLoading, fetchNext, hasNext } = useFetchGames(debouncedName);
 
-    return () => clearTimeout(timeout);
-  }, [gameName]);
+  const { loadMoreRef } = useInfiniteScroll(
+    () => {
+      if (hasNext && !isLoading) {
+        fetchNext();
+      }
 
-  const { games, hasError, isLoading, hasNext, next, fetchNextPage } =
-    useFetchGames({
-      gameName: debouncedGameName,
-    });
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <needless>
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-
-    const scrollContainer = loadMoreRef.current.parentElement;
-    if (!scrollContainer) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          fetchNextPage(next);
-        }
-      },
-      {
-        root: scrollContainer,
-        rootMargin: "150px",
-        threshold: 0,
-      },
-    );
-
-    observer.observe(loadMoreRef.current);
-
-    return () => observer.disconnect();
-  }, [fetchNextPage]);
-
-  if (hasError) {
-    return <p className="text-red-400">{hasError}</p>;
-  }
+      if (!isLoading) {
+        console.log("Sentinela ativo");
+      }
+    },
+    hasNext,
+    parentRef,
+  );
 
   return (
-    <div className="flex flex-1 flex-col gap-6 px-5">
-      <div className="flex items-center justify-center gap-2">
-        <p className="text-slate-300">Game Name:</p>
-        <input
-          type="search"
-          value={gameName}
-          onChange={(e) => setGameName(e.target.value)}
-          className="rounded-md bg-slate-800 px-3 py-1 text-slate-200 outline-none ring-1 ring-slate-700 focus:ring-blue-600"
-        />
-      </div>
-
-      <div className="flex-1 columns-2 space-y-3 overflow-y-auto relative">
+    <div className="flex-1 overflow-y-auto relative" ref={parentRef}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         {games.map((game) => (
           <div
             key={game.id}
             className="flex flex-col gap-2 overflow-hidden rounded-xl border border-slate-800 bg-slate-800/20 transition hover:border-blue-600/60"
           >
             <Image
+              loading="eager"
               src={game.imageUrl}
               width={360}
               height={480}
@@ -79,7 +46,7 @@ export function SelectPlayedGames() {
               className="h-48 w-full object-cover"
             />
 
-            <div className="flex justify-center pt-2">
+            <div className="flex justify-center flex-1 pt-2">
               <p className="text-center text-lg font-medium text-slate-200">
                 {game.name}
               </p>
@@ -90,13 +57,16 @@ export function SelectPlayedGames() {
             </div>
           </div>
         ))}
+
         {isLoading && (
           <div className="col-span-full flex justify-center py-4">
             <Loading />
           </div>
         )}
-        {hasNext && <div ref={loadMoreRef} className="h-10 w-full" />}
       </div>
+
+      {/* sentinel do infinite scroll */}
+      <div ref={loadMoreRef} className="h-10 w-full" />
     </div>
   );
 }
