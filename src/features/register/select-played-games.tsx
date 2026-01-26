@@ -2,14 +2,16 @@
 
 import { GameDetailsModal } from "@/components/game-details-modal";
 import { Loading } from "@/components/loading";
-import { GameObj, useFetchGames } from "@/hooks/use-fetch-games";
+import { type GameObj, useFetchGames } from "@/hooks/use-fetch-games";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scoll";
+import { useSaveGame } from "@/hooks/use-save-game";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
 export function SelectPlayedGames(props: { gameName: string }) {
   const parentRef = useRef(null);
   const [selectedGame, setSelectedGame] = useState<GameObj | null>(null);
+  const saveGame = useSaveGame();
 
   const { games, isLoading, fetchNext, hasNext } = useFetchGames(
     props.gameName,
@@ -73,10 +75,19 @@ export function SelectPlayedGames(props: { gameName: string }) {
         <GameDetailsModal
           game={selectedGame}
           onClose={() => {
-            console.log("close cliqued");
+            setSelectedGame(null);
           }}
-          onSave={(d) => {
-            console.log(d);
+          onSave={async (d) => {
+            try {
+              await saveGame.saveGame({
+                gameId: selectedGame.id,
+                hours_played: d.hours_played as number,
+                score: d.score as number,
+                status: d.status,
+              });
+            } catch (error) {
+              console.log(error);
+            }
           }}
         />
       )}
