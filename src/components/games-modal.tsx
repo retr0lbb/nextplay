@@ -10,7 +10,7 @@ interface GamesModalProps {
   onClose: () => void;
 }
 
-export function GamesModal() {
+export function GamesModal(props: GamesModalProps) {
   const [gameName, setGameName] = useState("");
   const debouncedName = useDebounce<string>(gameName, 500);
   return (
@@ -25,7 +25,7 @@ export function GamesModal() {
           onChange={(e) => setGameName(e.target.value)}
         />
       </div>
-      <div className="w-full h-full min-h-0 bg-slate-900 border border-white/10 overflow-y-scroll flex flex-col">
+      <div className="w-full h-full min-h-0 bg-slate-900 border border-white/10 overflow-y-hidden flex flex-col">
         <SelectPlayedGames gameName={debouncedName} />
       </div>
     </div>

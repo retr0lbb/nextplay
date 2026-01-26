@@ -1,3 +1,4 @@
+"use client";
 import { GamesModal } from "@/components/games-modal";
 import { Button } from "@/components/ui/button";
 
@@ -10,8 +11,7 @@ export default function AddGamesPage() {
           Add games
         </Button>
       </div>
-      <div className="flex flex-1 min-h-0 overflow-y-scroll overflow-x-hidden columns-2"></div>
-      <GamesModal />
+      <GamesModal onClose={() => {}} />
     </main>
   );
 }

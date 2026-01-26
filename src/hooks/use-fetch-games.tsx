@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
-interface GameObj {
+export interface GameObj {
   id: number;
   name: string;
   imageUrl: string;
